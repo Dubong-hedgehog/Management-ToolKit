@@ -1,5 +1,7 @@
 # biz-support-toolkit
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Dubong-hedgehog/Management-ToolKit/blob/main/notebooks/finance_demo.ipynb)
+
 경영지원팀(회계·재무 / 인사·총무 / 구매·계약)에서 반복적으로 발생하는 업무를
 자동화하는 Python 스크립트 모음입니다. 실제 사내 프로세스를 일반화한 로직에
 가짜 샘플 데이터를 붙여, **클론 후 바로 실행하면 결과(엑셀 리포트, 차트)를
