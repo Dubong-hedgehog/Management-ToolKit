@@ -27,7 +27,7 @@
 
 **인사/총무 — 부서별 지각률**
 
-![attendance dashboard](docs/screenshots/hr_late_by_dept.png)
+![attendance dashboard](docs/screenshots/hr_person_overview.png)
 
 **구매/계약 — 계약 만료 D-day**
 
