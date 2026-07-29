@@ -15,9 +15,12 @@
 
 | 카테고리 | 스크립트 | 하는 일 |
 |---|---|---|
-| [`finance/`](finance) | `income_statement_generator.py` | 월별 거래 내역 → 간이 손익계산서 + 매출/영업이익 추이 차트 |
-| [`hr/`](hr) | `attendance_dashboard.py` | 출퇴근 기록 → 부서별 지각률/초과근무 집계 + 그래프 |
-| [`procurement/`](procurement) | `contract_expiry_tracker.py` | 계약 현황 → 만료 임박 계약 강조 리포트 + D-day 차트 |
+| [`finance/`](finance) | `income_statement_generator.py` | 월별 거래 내역 → 기간(년/반기/분기/월/주) 자유 비교 손익계산서 + 매출/영업이익 추이 차트 |
+| [`finance/`](finance) | `financial_statements_pdf.py` | 거래내역 + 잔액 데이터 → K-GAAP 공식 서식 손익계산서/재무상태표 PDF |
+| [`hr/`](hr) | `attendance_dashboard.py` | 출퇴근 기록 → 부서별 지각률/초과근무 기간 비교 + 그래프 |
+| [`hr/`](hr) | `attendance_pattern_analysis.py` | 출퇴근 기록 → 직원별 지각/야근 이상패턴 탐지 + 근로복지공단 기준 야근 위험단계 |
+| [`procurement/`](procurement) | `contract_wbs_tracker.py` | 계약 현황 → 계약전~종료 WBS 진행률 + 지연/만료임박(D-30/D-60) 알림 |
+| [`procurement/`](procurement) | `vendor_purchase_analysis.py` | 구매내역 → 구매처 ABC등급/집중도(HHI) + 단가 급등 이상탐지 |
 
 ### 실행 결과 미리보기
 
@@ -25,13 +28,13 @@
 
 ![income statement trend](docs/screenshots/finance_revenue_trend.png)
 
-**인사/총무 — 부서별 지각률**
+**인사/총무 — 직원별 지각·야근 현황 및 위험단계**
 
-![attendance dashboard](docs/screenshots/hr_person_overview.png)
+![attendance pattern overview](docs/screenshots/hr_person_overview.png)
 
-**구매/계약 — 계약 만료 D-day**
+**구매/계약 — 진행중 계약 현황 및 만료 임박(D-30/D-60)**
 
-![contract expiry](docs/screenshots/procurement_expiry_dday.png)
+![contract gantt](docs/screenshots/procurement_contract_gantt.png)
 
 ## 시작하기
 
@@ -40,14 +43,20 @@ git clone <이 저장소 주소>
 cd Management ToolKit
 pip install -r requirements.txt
 
-# 예제 1: 손익계산서
+# 예제 1: 손익계산서 (기간 자유 비교)
 python finance/income_statement_generator.py
 
-# 예제 2: 근태 대시보드
+# 예제 2: 근태 대시보드 (부서별 기간 비교)
 python hr/attendance_dashboard.py
 
-# 예제 3: 계약 만료 트래커
-python procurement/contract_expiry_tracker.py --warn-days 90
+# 예제 3: 근태 이상패턴 분석 (개인/부서 이상탐지 + 야근 위험단계)
+python hr/attendance_pattern_analysis.py
+
+# 예제 4: 계약 WBS 트래커 (진행률/지연/만료임박 알림)
+python procurement/contract_wbs_tracker.py
+
+# 예제 5: 구매처 패턴 분석 (ABC/HHI/단가급등)
+python procurement/vendor_purchase_analysis.py
 ```
 
 각 스크립트는 `sample_data/` 안의 가짜 데이터로 바로 실행되며, 결과는 같은
@@ -59,19 +68,32 @@ python procurement/contract_expiry_tracker.py --warn-days 90
 
 ```
 biz-support-toolkit/
-├── common/              # 카테고리 전반에서 재사용하는 유틸 (엑셀 IO, 차트 스타일, 포맷팅)
+├── common/              # 카테고리 전반에서 재사용하는 유틸
+│   ├── excel_io.py       # 엑셀 읽기/쓰기 (자동필터 포함)
+│   ├── chart_style.py    # 차트 스타일/한글 폰트/저장(dpi 고정)
+│   ├── format_utils.py   # 숫자/퍼센트 포맷팅
+│   ├── period_utils.py   # 년/반기/분기/월/주 기간 비교 로직
+│   ├── tax_utils.py      # 법인세/부가세 추정 계산
+│   ├── sheet_io.py       # 구글시트 연동(.env, 미설정시 로컬 CSV로 자동 대체)
+│   ├── pdf_statement.py  # K-GAAP 서식 PDF 렌더러
+│   └── notify_utils.py   # 이메일/슬랙/팀즈 알림(.env, 미설정시 콘솔+로그로 대체)
 ├── finance/             # 회계·재무 업무
 │   ├── sample_data/
-│   ├── output/          # 실행 시 생성 (git에는 포함 안 함)
-│   └── income_statement_generator.py
+│   ├── output/           # 실행 시 생성 (git에는 포함 안 함)
+│   ├── income_statement_generator.py
+│   └── financial_statements_pdf.py
 ├── hr/                  # 인사·총무 업무
 │   ├── sample_data/
 │   ├── output/
-│   └── attendance_dashboard.py
+│   ├── attendance_dashboard.py
+│   └── attendance_pattern_analysis.py
 ├── procurement/         # 구매·계약 업무
-│   ├── sample_data/
+│   ├── sample_data/       # contracts.csv / wbs_tasks.csv / purchases.csv
 │   ├── output/
-│   └── contract_expiry_tracker.py
+│   ├── contract_wbs_tracker.py
+│   └── vendor_purchase_analysis.py
+├── notebooks/            # Colab에서 바로 열어 실행해보는 인터랙티브 데모
+│   └── finance_demo.ipynb
 ├── docs/screenshots/    # README용 결과 미리보기 이미지 (고정 보관)
 ├── CONVENTIONS.md       # 새 스크립트/카테고리 추가 시 지키는 규칙
 └── requirements.txt

@@ -371,13 +371,13 @@ def plot_person_overview(person_df: pd.DataFrame, output_path, scope: str = "위
             r["위험단계"], r["이상패턴"],
         ])
 
-    fig_h = max(1.2, 0.42 * (len(cell_data) + 1))
-    fig, ax = plt.subplots(figsize=(11, fig_h))
+    fig_h = max(2.0, 0.6 * (len(cell_data) + 1))
+    fig, ax = plt.subplots(figsize=(14, fig_h))
     ax.axis("off")
     tbl = ax.table(cellText=cell_data, colLabels=col_labels, loc="center", cellLoc="center")
     tbl.auto_set_font_size(False)
-    tbl.set_fontsize(9)
-    tbl.scale(1, 1.6)
+    tbl.set_fontsize(13)
+    tbl.scale(1, 2.4)
     tbl.auto_set_column_width(col=list(range(len(col_labels))))
 
     for j in range(len(col_labels)):
@@ -393,7 +393,7 @@ def plot_person_overview(person_df: pd.DataFrame, output_path, scope: str = "위
         cell.set_facecolor(color)
         cell.set_text_props(color="white", fontweight="bold")
 
-    ax.set_title(f"직원별 지각·야근 현황 및 위험단계 ({title_scope})", fontsize=12, pad=14)
+    ax.set_title(f"직원별 지각·야근 현황 및 위험단계 ({title_scope})", fontsize=16, pad=16)
     fig.tight_layout()
     return save_chart(fig, output_path)
 
