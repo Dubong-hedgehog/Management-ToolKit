@@ -1,23 +1,17 @@
 # biz-support-toolkit
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Dubong-hedgehog/Management-ToolKit/blob/main/notebooks/finance_demo.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Dubong-hedgehog/Management-ToolKit/blob/main/notebooks/finance_demo.ipynb)   < -- 조작예시
 
 경영지원팀(회계·재무 / 인사·총무 / 구매·계약)에서 반복적으로 발생하는 업무를
-자동화하는 Python 스크립트 모음입니다. 실제 사내 프로세스를 일반화한 로직에
-가짜 샘플 데이터를 붙여, **클론 후 바로 실행하면 결과(엑셀 리포트, 차트)를
-눈으로 확인**할 수 있도록 만들었습니다.
+자동화하는 Python 스크립트 모음입니다.
+실제 사내 프로세스를 일반화된 로직으로 만들고 데이터는 샘플 데이터를 붙여놓은 상태로
+**클론 후 바로 실행하면 결과(엑셀 리포트, 차트)를 눈으로 확인**할 수 있도록 만들었습니다.
 
-> 이 저장소는 실무 자동화 도구인 동시에 개인 포트폴리오를 겸합니다.
-> 특정 회사의 실제 데이터는 포함되어 있지 않으며, 모든 로직은 다른 조직에서도
-> 계정과목/컬럼명 등 설정값만 바꾸면 재사용할 수 있도록 범용적으로 작성했습니다.
+> 모든 데이터는 샘플 데이터로 실 회사의 데이터와 관계 없습니다.
+> 계정과목/컬럼명 등 회사 맞춤형으로 변경하여 운영 가능.
 
-## Why?
 
-경영지원팀 업무는 대부분 "엑셀/CSV를 받아서 → 집계하고 → 보고서나 그래프로
-만든다"는 패턴을 반복합니다. 이 패턴을 코드로 표준화해두면 같은 작업을 매달
-반복하지 않아도 되고, 사람마다 계산 방식이 달라지는 실수도 줄일 수 있습니다.
-
-## 포함 예제
+## 예제
 
 | 카테고리 | 스크립트 | 하는 일 |
 |---|---|---|
