@@ -90,6 +90,9 @@ TIER_VERY_HIGH_4W = 64.0   # 4주 평균 64h 초과 -> 매우위험
 TIER_HIGH_12W = 60.0       # 12주 평균 60h 초과 -> 위험
 TIER_CAUTION_12W = 52.0    # 12주 평균 52h 초과 -> 주의 (법정 연장한도 초과)
 
+# ---- 지각 시간(분) 기준 출근시각 ----
+STANDARD_START_MIN = 9 * 60  # 09:00 기준, 이후 도착분(분)을 지각시간으로 본다
+
 
 # ------------------------------------------------------------------
 # 데이터 로드
@@ -103,6 +106,15 @@ def load_attendance(input_path: str | Path) -> pd.DataFrame:
     df["초과근무시간"] = pd.to_numeric(df["초과근무시간"], errors="coerce").fillna(0)
     df["지각"] = (df["지각여부"] == "Y").astype(int)
     df["요일"] = df["거래일자"].dt.day_name()
+
+    def _to_minutes(t: str) -> int:
+        h, m = str(t).split(":")
+        return int(h) * 60 + int(m)
+
+    start_min = df["출근시각"].map(_to_minutes)
+    # 지각이 아닌 날은 정의상 지각시간 0으로 둔다(정시 도착이 09:00을 살짝
+    # 넘는 랜덤 노이즈로 잡히는 걸 방지 — 지각여부 컬럼을 기준으로 판단).
+    df["지각분"] = np.where(df["지각"] == 1, (start_min - STANDARD_START_MIN).clip(lower=0), 0)
     return df
 
 
@@ -281,6 +293,112 @@ def detect_dept_overtime_anomaly(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # ------------------------------------------------------------------
+# 6) 개인 종합 현황표 (전체 / 위험군 / 이상패턴 필터용)
+# ------------------------------------------------------------------
+def build_person_summary(
+    df: pd.DataFrame,
+    weekday_df: pd.DataFrame,
+    trend_df: pd.DataFrame,
+    risk_df: pd.DataFrame,
+) -> pd.DataFrame:
+    """사람별로 지각/야근/위험단계를 한 줄에 모은 종합표.
+
+    엑셀에서 '위험군' / '이상패턴' 컬럼으로 자동필터를 걸면 전체·위험군만·
+    이상패턴만을 그 자리에서 골라볼 수 있다(save_excel_report의
+    autofilter=True로 헤더에 필터 버튼이 붙는다).
+    """
+    pattern_by_emp: dict[int, list[str]] = {}
+    for _, r in weekday_df.iterrows():
+        pattern_by_emp.setdefault(r["사번"], []).append(f"요일집중형({r['집중 요일']})")
+    for _, r in trend_df.iterrows():
+        pattern_by_emp.setdefault(r["사번"], []).append("추세악화형")
+
+    late_agg = df.groupby(["사번", "이름", "부서"]).agg(
+        지각횟수=("지각", "sum"),
+        총지각시간_분=("지각분", "sum"),
+        야근총시간_h=("초과근무시간", "sum"),
+    ).reset_index()
+    late_agg["평균지각시간_분"] = np.where(
+        late_agg["지각횟수"] > 0,
+        (late_agg["총지각시간_분"] / late_agg["지각횟수"]).round(1),
+        0.0,
+    )
+
+    out = late_agg.merge(
+        risk_df[["사번", "최근4주 평균 주당근로시간", "최근12주 평균 주당근로시간", "위험단계"]],
+        on="사번", how="left",
+    )
+    out["이상패턴"] = out["사번"].map(lambda e: ", ".join(pattern_by_emp.get(e, [])) or "-")
+    out["위험군"] = out["위험단계"].isin(["위험", "매우위험"]).map({True: "Y", False: "N"})
+    out["이상패턴여부"] = out["사번"].map(lambda e: "Y" if e in pattern_by_emp else "N")
+
+    out = out[[
+        "사번", "이름", "부서",
+        "지각횟수", "총지각시간_분", "평균지각시간_분",
+        "야근총시간_h", "최근4주 평균 주당근로시간", "최근12주 평균 주당근로시간",
+        "위험단계", "위험군", "이상패턴", "이상패턴여부",
+    ]]
+    return out.sort_values(["위험군", "이상패턴여부", "총지각시간_분"], ascending=[False, False, False]).reset_index(drop=True)
+
+
+TIER_COLOR = {"매우위험": "#C0102A", "위험": "#E8630A", "주의": "#F2B705", "정상": "#3A7D44", "데이터부족": "#999999"}
+
+
+def plot_person_overview(person_df: pd.DataFrame, output_path, scope: str = "위험군+이상패턴", max_rows: int = 16) -> Path:
+    """사람별 지각/야근/위험단계 종합표를 이미지(표)로 렌더링.
+
+    scope="전체": 전 인원, scope="위험군+이상패턴": 위험군이거나 이상패턴이
+    있는 사람만 골라 보여준다(README 미리보기용 기본값 — 이 도구가 실제로
+    무엇을 잡아내는지 한눈에 보여주는 게 목적이라 전체 20명보다 임팩트 있음).
+    엑셀 리포트의 '개인_종합현황' 시트는 자동필터가 걸려 있어 전체/위험군/
+    이상패턴을 직접 걸러볼 수 있다.
+    """
+    setup_style()
+    if scope == "위험군+이상패턴":
+        shown = person_df[(person_df["위험군"] == "Y") | (person_df["이상패턴여부"] == "Y")]
+        title_scope = "위험군 + 이상패턴 대상자"
+    else:
+        shown = person_df
+        title_scope = "전체 인원"
+    shown = shown.head(max_rows)
+
+    col_labels = ["이름", "부서", "지각횟수", "총지각시간(분)", "야근총시간(h)", "위험단계", "이상패턴"]
+    cell_data = []
+    for _, r in shown.iterrows():
+        cell_data.append([
+            r["이름"], r["부서"], f"{int(r['지각횟수'])}",
+            f"{r['총지각시간_분']:.0f}", f"{r['야근총시간_h']:.1f}",
+            r["위험단계"], r["이상패턴"],
+        ])
+
+    fig_h = max(1.2, 0.42 * (len(cell_data) + 1))
+    fig, ax = plt.subplots(figsize=(11, fig_h))
+    ax.axis("off")
+    tbl = ax.table(cellText=cell_data, colLabels=col_labels, loc="center", cellLoc="center")
+    tbl.auto_set_font_size(False)
+    tbl.set_fontsize(9)
+    tbl.scale(1, 1.6)
+    tbl.auto_set_column_width(col=list(range(len(col_labels))))
+
+    for j in range(len(col_labels)):
+        cell = tbl[0, j]
+        cell.set_facecolor("#2E5EAA")
+        cell.set_text_props(color="white", fontweight="bold")
+
+    tier_col_idx = col_labels.index("위험단계")
+    for i, row in enumerate(cell_data, start=1):
+        tier = row[tier_col_idx]
+        color = TIER_COLOR.get(tier, "#FFFFFF")
+        cell = tbl[i, tier_col_idx]
+        cell.set_facecolor(color)
+        cell.set_text_props(color="white", fontweight="bold")
+
+    ax.set_title(f"직원별 지각·야근 현황 및 위험단계 ({title_scope})", fontsize=12, pad=14)
+    fig.tight_layout()
+    return save_chart(fig, output_path)
+
+
+# ------------------------------------------------------------------
 # 차트
 # ------------------------------------------------------------------
 def plot_weekday_heatmap(df: pd.DataFrame, output_path) -> Path:
@@ -408,8 +526,10 @@ def main() -> None:
     dept_late_df = detect_dept_late_anomaly(df)
     risk_df = detect_overtime_risk(df, as_of)
     dept_ot_df = detect_dept_overtime_anomaly(df)
+    person_df = build_person_summary(df, weekday_df, trend_df, risk_df)
 
     excel_path = save_excel_report({
+        "개인_종합현황": person_df,
         "개인_지각_요일집중형": weekday_df,
         "개인_지각_추세악화형": trend_df,
         "부서_지각이상치": dept_late_df,
@@ -420,10 +540,17 @@ def main() -> None:
     heatmap_path = plot_weekday_heatmap(df, HERE / "output" / "late_weekday_heatmap.png")
     risk_trend_path = plot_overtime_risk_trend(df, risk_df, as_of, HERE / "output" / "overtime_risk_trend.png")
     dept_trend_path = plot_dept_monthly_trend(df, HERE / "output" / "dept_monthly_trend.png")
+    person_overview_path = plot_person_overview(
+        person_df, HERE / "output" / "person_overview.png", scope="위험군+이상패턴"
+    )
+    person_overview_all_path = plot_person_overview(
+        person_df, HERE / "output" / "person_overview_all.png", scope="전체"
+    )
 
     print_summary(weekday_df, trend_df, dept_late_df, risk_df, dept_ot_df, as_of)
-    print(f"\n엑셀 리포트 저장: {excel_path}")
+    print(f"\n엑셀 리포트 저장: {excel_path} (개인_종합현황 시트에서 '위험군'/'이상패턴여부' 컬럼 필터로 전체/위험군/이상패턴을 골라볼 수 있음)")
     print(f"차트 저장: {heatmap_path}, {risk_trend_path}, {dept_trend_path}")
+    print(f"인원 종합표 이미지: {person_overview_path} (README 미리보기용), {person_overview_all_path} (전체 인원)")
 
 
 if __name__ == "__main__":
