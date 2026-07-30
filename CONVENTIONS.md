@@ -144,5 +144,6 @@
 
 - Node.js/TypeScript 도입 여부: 슬랙 알림, 웹훅, 대시보드성 웹앱처럼 실시간 연동이 필요한 업무가 생기면 그 부분만 별도 스택(`integrations/` 등)으로 추가하는 것을 검토한다. 문서/엑셀 중심 업무는 계속 Python으로 유지한다.
 - 스크립트가 많아지면 카테고리별 `requirements.txt` 분리 여부 재검토.
-- finance/hr/procurement 카테고리별 `README.md` 작성 (1번 체크리스트 미충족 상태로 밀려 있음).
-- HR/구매·계약도 재무처럼 Colab 인터랙티브 노트북 추가할지 검토.
+- finance/hr/procurement/general_affairs 카테고리별 `README.md` 작성 (1번 체크리스트 미충족 상태로 밀려 있음).
+- HR/구매·계약/총무도 재무처럼 Colab 인터랙티브 노트북 추가할지 검토.
+- legal(법무) 카테고리는 아직 미착수.

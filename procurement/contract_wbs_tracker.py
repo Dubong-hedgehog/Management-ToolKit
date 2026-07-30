@@ -138,6 +138,8 @@ def build_expiry_alerts(contracts: pd.DataFrame, as_of: pd.Timestamp) -> pd.Data
     active = active[active["잔여일수"] <= EXPIRY_ALERT_DAYS]
 
     def _bucket(days):
+        if days < 0:
+            return "만료됨(즉시 확인 필요)"
         if days <= EXPIRY_WARN_DAYS:
             return f"D-{EXPIRY_WARN_DAYS} 이내(긴급)"
         return f"D-{EXPIRY_ALERT_DAYS} 이내(예고)"
@@ -153,7 +155,8 @@ def notify_expiry(expiry_df: pd.DataFrame, as_of: pd.Timestamp) -> str:
         return "만료 임박 계약 없음 - 알림 미발송"
     lines = [f"{as_of.date()} 기준 계약만료 임박 알림 ({len(expiry_df)}건)"]
     for _, r in expiry_df.iterrows():
-        lines.append(f"- [{r['긴급도']}] {r['계약명']}({r['공급업체']}) 종료일 {r['계약종료일'].date()} (D-{r['잔여일수']})")
+        dday = f"D-{r['잔여일수']}" if r["잔여일수"] >= 0 else f"D+{-r['잔여일수']} 경과"
+        lines.append(f"- [{r['긴급도']}] {r['계약명']}({r['공급업체']}) 종료일 {r['계약종료일'].date()} ({dday})")
     body = "\n".join(lines)
     result = send_alert(
         subject=f"[계약만료 임박] {len(expiry_df)}건 확인 필요",
@@ -236,7 +239,8 @@ def print_summary(progress_df, delay_df, expiry_df, checklist_df, notify_result,
         print("  해당 없음")
     else:
         for _, r in expiry_df.iterrows():
-            print(f"  - [{r['긴급도']}] {r['계약명']}({r['공급업체']}) 종료 {r['계약종료일'].date()} (D-{r['잔여일수']})")
+            dday = f"D-{r['잔여일수']}" if r["잔여일수"] >= 0 else f"D+{-r['잔여일수']} 경과"
+            print(f"  - [{r['긴급도']}] {r['계약명']}({r['공급업체']}) 종료 {r['계약종료일'].date()} ({dday})")
     print(f"  알림 발송 결과: {notify_result}")
 
     print("\n[4] 보증보험/실적증명서 확인 필요 항목")
