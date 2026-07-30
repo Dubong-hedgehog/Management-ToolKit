@@ -371,13 +371,18 @@ def plot_person_overview(person_df: pd.DataFrame, output_path, scope: str = "위
             r["위험단계"], r["이상패턴"],
         ])
 
-    fig_h = max(2.0, 0.6 * (len(cell_data) + 1))
-    fig, ax = plt.subplots(figsize=(14, fig_h))
+    # 다른 두 대표 이미지(재무 라인차트 ~1.9:1, 구매/계약 간트차트 ~1.68:1)와
+    # README에서 비슷한 크기로 보이도록 세로 비율을 맞춘다. ax.table을
+    # loc="center"로만 두면 내용 크기만큼만 작게 그려져 사방에 여백이 크게
+    # 남는 문제가 있어서, bbox=[0,0,1,1]로 테이블이 축 전체를 채우게 한다.
+    n_rows = len(cell_data) + 1  # 헤더 포함
+    fig_w = 12.0
+    fig_h = max(4.0, min(7.0, 0.85 * n_rows + 1.2))
+    fig, ax = plt.subplots(figsize=(fig_w, fig_h))
     ax.axis("off")
-    tbl = ax.table(cellText=cell_data, colLabels=col_labels, loc="center", cellLoc="center")
+    tbl = ax.table(cellText=cell_data, colLabels=col_labels, cellLoc="center", bbox=[0, 0, 1, 1])
     tbl.auto_set_font_size(False)
-    tbl.set_fontsize(13)
-    tbl.scale(1, 2.4)
+    tbl.set_fontsize(14)
     tbl.auto_set_column_width(col=list(range(len(col_labels))))
 
     for j in range(len(col_labels)):
