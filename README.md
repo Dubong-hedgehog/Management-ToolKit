@@ -2,7 +2,7 @@
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Dubong-hedgehog/Management-ToolKit/blob/main/notebooks/finance_demo.ipynb)   < -- 조작예시
 
-경영지원팀(회계·재무 / 인사 / 총무 / 구매·계약)에서 반복적으로 발생하는 업무를
+경영지원팀(회계·재무 / 인사 / 총무 / 구매·계약 / 법무)에서 반복적으로 발생하는 업무를
 자동화하는 Python 스크립트 모음입니다.
 실제 사내 프로세스를 일반화된 로직으로 만들고 데이터는 샘플 데이터를 붙여놓은 상태로
 **클론 후 바로 실행하면 결과(엑셀 리포트, 차트)를 눈으로 확인**할 수 있도록 만들었습니다.
@@ -24,24 +24,63 @@
 | [`general_affairs/`](general_affairs) | `asset_lifecycle_tracker.py` | 비품/고정자산/법인차량 → 취득~폐기 생애주기 + 감가상각 + 보험갱신 임박 알림 |
 | [`general_affairs/`](general_affairs) | `safety_training_tracker.py` | 교육 이수기록 → 법정의무교육(산업안전보건법) 이수율 + 기한경과 미이수자 알림 |
 | [`general_affairs/`](general_affairs) | `general_affairs_ledger.py` | 시설계약/문서·인장/행사·복리후생 → 통합 관리대장 + 계약만료·문서폐기 알림 |
+| [`legal/`](legal) | `contract_document_registry.py` | 계약서 마스터 → 하드본/소프트본 원본 보관현황 + 계약유형별 필수조항 포함율 히트맵 |
 
 ### 실행 결과 미리보기
 
-**회계/재무 — 매출·영업이익 추이**
+**회계/재무**
+
+매출·영업이익 추이 (`income_statement_generator.py`)
 
 ![income statement trend](docs/screenshots/finance_revenue_trend.png)
 
-**인사 — 직원별 지각·야근 현황 및 위험단계**
+K-GAAP 공식 서식 손익계산서 PDF (`financial_statements_pdf.py`)
+
+![income statement pdf preview](docs/screenshots/finance_statement_pdf_preview.png)
+
+**인사**
+
+직원별 지각·야근 현황 및 위험단계 (`attendance_pattern_analysis.py`)
 
 ![attendance pattern overview](docs/screenshots/hr_person_overview.png)
 
-**구매/계약 — 진행중 계약 현황 및 만료 임박(D-30/D-60)**
+직원별 요일별 지각률 히트맵 — 요일 집중형 이상패턴 탐지 (`attendance_pattern_analysis.py`)
+
+![late weekday heatmap](docs/screenshots/hr_late_weekday_heatmap.png)
+
+**구매/계약**
+
+진행중 계약 현황 및 만료 임박(D-30/D-60) (`contract_wbs_tracker.py`)
 
 ![contract gantt](docs/screenshots/procurement_contract_gantt.png)
 
-**총무 — 자산 카테고리별 장부가액 및 상태 분포**
+구매처별 파레토(ABC 등급) 분석 (`vendor_purchase_analysis.py`)
+
+![vendor pareto](docs/screenshots/procurement_vendor_pareto.png)
+
+**총무**
+
+자산 카테고리별 장부가액 및 상태 분포 (`asset_lifecycle_tracker.py`)
 
 ![asset lifecycle status](docs/screenshots/general_affairs_asset_status.png)
+
+부서별 법정의무교육 이수율 (`safety_training_tracker.py`)
+
+![safety training completion](docs/screenshots/general_affairs_safety_training.png)
+
+시설/용역 계약 현황 (`general_affairs_ledger.py`)
+
+![facility contracts](docs/screenshots/general_affairs_facility_contracts.png)
+
+**법무**
+
+하드본(원본)/소프트본 보관 현황 (`contract_document_registry.py`)
+
+![hardcopy status](docs/screenshots/legal_hardcopy_status.png)
+
+계약유형별 필수조항 포함율 히트맵 — 조항 누락 리스크 탐지 (`contract_document_registry.py`)
+
+![clause coverage heatmap](docs/screenshots/legal_clause_coverage_heatmap.png)
 
 ## 시작하기
 
@@ -73,6 +112,9 @@ python general_affairs/safety_training_tracker.py
 
 # 예제 8: 총무 통합 관리대장 (시설계약/문서관리/행사·복리후생)
 python general_affairs/general_affairs_ledger.py
+
+# 예제 9: 계약서 관리 (원본 보관현황 + 필수조항 체크)
+python legal/contract_document_registry.py
 ```
 
 각 스크립트는 `sample_data/` 안의 가짜 데이터로 바로 실행되며, 결과는 같은
@@ -114,6 +156,10 @@ biz-support-toolkit/
 │   ├── asset_lifecycle_tracker.py
 │   ├── safety_training_tracker.py
 │   └── general_affairs_ledger.py
+├── legal/                # 법무 업무
+│   ├── sample_data/       # contracts_registry.csv
+│   ├── output/
+│   └── contract_document_registry.py
 ├── notebooks/            # Colab에서 바로 열어 실행해보는 인터랙티브 데모
 │   └── finance_demo.ipynb
 ├── docs/screenshots/    # README용 결과 미리보기 이미지 (고정 보관)
