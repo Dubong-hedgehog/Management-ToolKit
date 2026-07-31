@@ -13,7 +13,7 @@ clone 후 명령어 한 줄이면 엑셀 리포트/차트/PDF 같은 실제 결�
 | finance | `income_statement_generator.py` | 월별 손익계산서 생성 + 전기 대비 증감 분석 | `python finance/income_statement_generator.py` |
 | finance | `financial_statements_pdf.py` | 손익계산서·재무상태표를 공식 서식 PDF로 출력 | `python finance/financial_statements_pdf.py` |
 | hr | `attendance_dashboard.py` | 부서별 지각률/초과근무를 원하는 기간(년/반기/분기/월/주)으로 비교 | `python hr/attendance_dashboard.py` |
-| hr | `attendance_pattern_analysis.py` | 개인/부서별 지각 패턴 탐지 + 근로복지공단 과로사 인정기준 기반 야근 위험도 단계 | `python hr/attendance_pattern_analysis.py` |
+| hr | `attendance_pattern_analysis.py` | 개인별 지각 "이번달 vs 지난달" 경고/개선 추적 + 부서 이상치 + 근로복지공단 과로사 인정기준 기반 야근 위험도 단계(지각과 별개 지표) | `python hr/attendance_pattern_analysis.py` |
 | hr | `build_fit_profile.py` | 과거 재직자(장기재직 vs 조기퇴사) 이력서를 학습해 "회사 핏" 프로파일 생성 | `python hr/build_fit_profile.py` |
 | hr | `resume_fit_report.py` | 신규 지원자 이력서 → 적합도 분석 PDF 리포트 자동 생성 (Claude API 연동) | `python hr/resume_fit_report.py` |
 | procurement | `contract_wbs_tracker.py` | 계약 전~종료 단계 WBS 관리, 보증보험/실적증명서 체크, 만료 임박 알림(D-30/D-60) | `python procurement/contract_wbs_tracker.py` |
@@ -67,7 +67,7 @@ clone 후 명령어 한 줄이면 엑셀 리포트/차트/PDF 같은 실제 결�
 **hr — 근태**
 
 ![개인별 지각/야근 위험도](docs/screenshots/hr_person_overview.png)
-![요일별 지각 히트맵](docs/screenshots/hr_late_weekday_heatmap.png)
+![개인별 지각·초과근무 월간 추이 예시](docs/screenshots/hr_person_monthly_examples.png)
 
 **hr — 채용 A to Z**
 
@@ -151,6 +151,7 @@ biz-support-toolkit/
 │   └── financial_statements_pdf.py
 ├── hr/
 │   ├── sample_data/
+│   │   └── generate_attendance_sample.py
 │   ├── output/
 │   ├── attendance_dashboard.py
 │   ├── attendance_pattern_analysis.py
