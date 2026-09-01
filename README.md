@@ -1,10 +1,10 @@
 # biz-support-toolkit
 
-경영지원팀(회계·재무 / 인사·총무 / 구매·계약 / 법무) 실무를 자동화하는 파이썬 스크립트 모음입니다.
-모든 스크립트는 뼈대가 아니라 실제로 끝까지 실행되며, 가상의 샘플 데이터가 함께 들어 있어서
-clone 후 명령어 한 줄이면 엑셀 리포트/차트/PDF 같은 실제 결과물을 바로 확인할 수 있습니다.
+경영지원팀(회계·재무 / 인사·총무 / 구매·계약 / 법무) 실무 자동화를 위한 파이썬 스크립트 모음
+모든 스크립트는 뼈대가 아니라 가상의 샘플 데이터가 함께 들어 있어 clone 후 명령어 한 줄이면
+실제 결과물을 바로 확인할 수 있도록 세팅했습니다.
 
-⚠️ 모든 샘플 데이터는 가상의 값입니다. 실제 회사 데이터나 개인정보는 이 저장소에 절대 포함되지 않습니다.
+// 모든 데이터는 가상의 값으로 회사별 데이터 구조에 맞춰 커스텀 필요.
 
 ## 카테고리 & 스크립트
 
@@ -22,6 +22,7 @@ clone 후 명령어 한 줄이면 엑셀 리포트/차트/PDF 같은 실제 결�
 | general_affairs | `safety_training_tracker.py` | 법정의무교육 이수현황(부서별/개인별), 미이수자 알림 | `python general_affairs/safety_training_tracker.py` |
 | general_affairs | `general_affairs_ledger.py` | 임대차·용역계약, 문서·인장 관리, 행사·복리후생 통합 관리대장 | `python general_affairs/general_affairs_ledger.py` |
 | legal | `contract_document_registry.py` | 계약서 원본(하드본/소프트본) 보관현황 + 필수조항 체크 매트릭스 | `python legal/contract_document_registry.py` |
+
 
 옵션 없이 실행하면 전부 `sample_data/`의 샘플 데이터로 동작합니다. `--input` 등 argparse 옵션으로
 실제 데이터 경로를 넘기면 그대로 재사용할 수 있습니다.
