@@ -152,50 +152,52 @@ python gov_subsidy/subsidy_schedule_calculator.py
 
 ## 폴더 구조
 
+\`\`\`
 biz-support-toolkit/
-├── common/ # 공통 유틸(엑셀 입출력, 차트 스타일, 포맷팅, 기간 계산,
-│ # 세금 추정, 시트 연동, PDF 렌더링, 알림, Claude API)
-│ ├── chart_style.py
-│ ├── excel_io.py
-│ ├── format_utils.py
-│ ├── llm_utils.py
-│ ├── notify_utils.py
-│ ├── pdf_statement.py
-│ ├── period_utils.py
-│ ├── sheet_io.py
-│ └── tax_utils.py
+├── common/                     # 공통 유틸(엑셀 입출력, 차트 스타일, 포맷팅, 기간 계산,
+│                                #  세금 추정, 시트 연동, PDF 렌더링, 알림, Claude API)
+│   ├── chart_style.py
+│   ├── excel_io.py
+│   ├── format_utils.py
+│   ├── llm_utils.py
+│   ├── notify_utils.py
+│   ├── pdf_statement.py
+│   ├── period_utils.py
+│   ├── sheet_io.py
+│   └── tax_utils.py
 ├── finance/
-│ ├── sample_data/
-│ ├── income_statement_generator.py
-│ └── financial_statements_pdf.py
+│   ├── sample_data/
+│   ├── income_statement_generator.py
+│   └── financial_statements_pdf.py
 ├── hr/
-│ ├── sample_data/
-│ │ └── generate_attendance_sample.py
-│ ├── output/
-│ ├── attendance_dashboard.py
-│ ├── attendance_pattern_analysis.py
-│ ├── fit_taxonomy.py
-│ ├── build_fit_profile.py
-│ └── resume_fit_report.py
+│   ├── sample_data/
+│   │   └── generate_attendance_sample.py
+│   ├── output/
+│   ├── attendance_dashboard.py
+│   ├── attendance_pattern_analysis.py
+│   ├── fit_taxonomy.py
+│   ├── build_fit_profile.py
+│   └── resume_fit_report.py
 ├── procurement/
-│ ├── sample_data/
-│ ├── contract_wbs_tracker.py
-│ └── vendor_purchase_analysis.py
+│   ├── sample_data/
+│   ├── contract_wbs_tracker.py
+│   └── vendor_purchase_analysis.py
 ├── general_affairs/
-│ ├── sample_data/
-│ ├── asset_lifecycle_tracker.py
-│ ├── safety_training_tracker.py
-│ └── general_affairs_ledger.py
+│   ├── sample_data/
+│   ├── asset_lifecycle_tracker.py
+│   ├── safety_training_tracker.py
+│   └── general_affairs_ledger.py
 ├── legal/
-│ ├── sample_data/
-│ └── contract_document_registry.py
+│   ├── sample_data/
+│   └── contract_document_registry.py
 ├── gov_subsidy/
-│ ├── sample_data/
-│ ├── output/
-│ ├── subsidy_rule_parser.py
-│ └── subsidy_schedule_calculator.py
+│   ├── sample_data/
+│   ├── output/
+│   ├── subsidy_rule_parser.py
+│   └── subsidy_schedule_calculator.py
 ├── notebooks/
-│ └── finance_demo.ipynb
+│   └── finance_demo.ipynb
 ├── docs/screenshots/
 ├── requirements.txt
 └── CONVENTIONS.md
+\`\`\`
